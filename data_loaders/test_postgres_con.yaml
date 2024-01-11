@@ -1,0 +1,10 @@
+config:
+  database: postgres
+  host: host.docker.internal
+  password: postgres
+  port: 5433
+  schema: public
+  username: admin
+  replication_slot: null
+  publication_name: null
+source: postgresql

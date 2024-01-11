@@ -1,0 +1,26 @@
+version: '3'
+services:
+  mageai:
+    image: mageai/mageai:0.9.50
+    volumes:
+      - ./:/home/src
+    ports:
+      - "6789:6789"
+      - "8000:8000"
+    command: /app/run_app.sh mage start .
+
+  origin:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./example/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: ["postgres", "-c", "log_statement=all"]
+
+
+
+# docker-compose down && docker-compose up --build
