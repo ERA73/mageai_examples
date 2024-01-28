@@ -20,8 +20,9 @@ def transform(data, *args, **kwargs):
         Anything (e.g. data frame, dictionary, array, int, str, etc.)
     """
     # Specify your transformation logic here
-    print(data.dtypes)
-    print(data.attrs)
+    print(data['table_name'], end='\n'*2)
+    print(data['types'], end='\n'*2)
+    print(data['data'])
     return data
 
 

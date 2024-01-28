@@ -72,6 +72,7 @@ class TableMapper:
       SELECT 
         column_name,
         data_type,
+        udt_name,
         COALESCE(character_maximum_length::text, '') AS character_maximum_length,
         COALESCE(numeric_precision::text, '') AS numeric_precision,
         COALESCE(numeric_scale::text, '') AS numeric_scale
@@ -137,13 +138,83 @@ class TableMapper:
         data[column_name] = related_operation(data[column_name])
 
     return data
-  
+
   def generate_create_table_postgres(self, table_name, column_dict):
-    columns = [f"{col} {data_type}" for col, data_type in column_dict.items()]
+    columns = []
+    for col, data_type in column_dict.items():
+      if data_type["udt_name"] == "varchar":
+        columns.append(f"{col} {data_type['udt_name']}({data_type['character_maximum_length']})")
+      elif data_type["udt_name"] == "numeric":
+        columns.append(f"{col} {data_type['udt_name']}({data_type['numeric_precision']},{data_type['numeric_scale']})")
+      else:
+        columns.append(f"{col} {data_type['udt_name']}")
     columns_str = ", ".join(columns)
-    return f"CREATE TABLE {table_name} ({columns_str});"
+    return f"CREATE TABLE if not exists {table_name} ({columns_str});"
 
   def generate_create_table_snowflake(self, table_name, column_dict):
     columns = [f"{col} {data_type}" for col, data_type in column_dict.items()]
     columns_str = ", ".join(columns)
     return f"CREATE TABLE {table_name} ({columns_str});"
+  
+  def resume_data_types(self, data_types):
+    resume_data_types = {}
+    for col, data_type in data_types.items():
+      resume_data_types[col] = data_type['udt_name']
+    return resume_data_types
+
+
+  def generate_insert_queries_postgres(self, table_name, data, data_types):
+    queries = []
+    limit = 3
+    data_groups = []
+    data_len = len(data)
+    index = 1
+
+    columns = list(data_types.keys())
+
+    while True:
+      if index*limit < data_len:
+        if index == 1:
+          data_groups.append(data[(index-1)*limit:index*limit-1])
+        else:
+          data_groups.append(data[(index-1)*limit-1:index*limit-1])
+      else:
+        data_groups.append(data[(index-1)*limit-1:])
+        break
+      index += 1
+
+    for group in data_groups:
+      values = []
+      for row in group:
+        record = []
+        for column in columns:
+          if row[column] and row[column] != 'NaT':
+            if data_types[column][:3] == "int":
+              record.append(str(int(row[column])))
+            elif data_types[column] == "numeric":
+              record.append(str(row[column]))
+            elif data_types[column] in ["char", "text", "varchar", "timestamp"]:
+              record.append(f"'{row[column]}'")
+            elif data_types[column] == "bool":
+              record.append(str(row[column]))
+            else:
+              record.append(str(row[column]))
+          else:
+            if data_types[column] == "bool" and row[column] is False:
+              record.append(str(row[column]))
+            else:
+              record.append("NULL")
+        values.append(f"({', '.join(record)})")
+      query = f"""
+        INSERT INTO {table_name}
+          ({', '.join(columns)})
+        VALUES {', '.join(values)};
+      """
+      queries.append(query)
+    return queries
+  
+  # {'id': 'int4', 'nombre': 'varchar', 'edad': 'int4', 'salario': 'numeric', 'fecha_nacimiento': 'timestamp', 'correo_electronico': 'varchar', 'is_student': 'bool'}
+
+  # INSERT INTO public.ejemplo
+  #   (id, nombre, edad, salario, fecha_nacimiento, correo_electronico, is_student)
+  #   VALUES(1, '', 0, 0, '', '', false);
