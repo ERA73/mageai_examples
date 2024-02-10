@@ -1,13 +1,52 @@
 version: '3'
 services:
-  mageai:
+  # mageai:
+  #   image: mageai/mageai:0.9.50
+  #   volumes:
+  #     - ./:/home/src
+  #   ports:
+  #     - "6789:6789"
+  #     - "8000:8000"
+  #   cpus: 0.5
+  #   mem_limit: 1g
+  #   command: /app/run_app.sh mage start .
+
+  mageai_front:
     image: mageai/mageai:0.9.50
     volumes:
       - ./:/home/src
+    env_file:
+      - .env
     ports:
       - "6789:6789"
-      - "8000:8000"
-    command: /app/run_app.sh mage start .
+    command: /app/run_app.sh mage start . --instance-type web_server
+    cpus: 0.5
+    mem_limit: 0.5g
+    networks:
+      - my_network
+  mageai_scheduler1:
+    image: mageai/mageai:0.9.50
+    volumes:
+      - ./:/home/src
+    env_file:
+      - .env
+    command: /app/run_app.sh mage start . --instance-type scheduler
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - my_network
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    cpus: 0.5
+    mem_limit: 0.5g
+    networks:
+      - my_network
 
   origin:
     image: postgres:latest
@@ -17,10 +56,10 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"
+    cpus: 1
     volumes:
-      - ./example/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./example/init_3.sql:/docker-entrypoint-initdb.d/init.sql
     command: ["postgres", "-c", "log_statement=all"]
-
   destination:
     image: postgres:latest
     environment:
@@ -29,7 +68,12 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5434:5432"
-
+    cpus: 1
+networks:
+  my_network:
+    driver: bridge
 
 
 # docker-compose down && docker-compose up --build
+# docker ps
+# docker stats 30c49f87da34
