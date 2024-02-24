@@ -20,10 +20,13 @@ services:
     ports:
       - "6789:6789"
     command: /app/run_app.sh mage start . --instance-type web_server
-    cpus: 0.5
-    mem_limit: 0.5g
+    cpus: 1
+    mem_limit: 1g
     networks:
       - my_network
+    depends_on:
+      - mage-db
+      - redis
   mageai_scheduler1:
     image: mageai/mageai:0.9.50
     volumes:
@@ -32,13 +35,16 @@ services:
       - .env
     command: /app/run_app.sh mage start . --instance-type scheduler
     deploy:
-      replicas: 1
+      replicas: 2
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '1'
+          memory: 1024M
     networks:
       - my_network
+    depends_on:
+      - mage-db
+      - redis
   redis:
     image: redis
     ports:
@@ -48,6 +54,15 @@ services:
     networks:
       - my_network
 
+  mage-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5430:5432"
+    cpus: 1
   origin:
     image: postgres:latest
     environment:
@@ -74,6 +89,6 @@ networks:
     driver: bridge
 
 
-# docker-compose down && docker-compose up --build
+# docker-compose down && docker-compose rm && docker-compose up --build
 # docker ps
 # docker stats 30c49f87da34

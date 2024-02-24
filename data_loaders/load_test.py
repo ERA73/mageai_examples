@@ -10,7 +10,10 @@ def trigger_failed_notification(api_endpoint, message_payload, headers):
 
 @data_loader
 def load_data(*args, **kwargs):
-    0/0
+    print('the try')
+    print(args)
+    print(kwargs)
+    # 0/0
     
     return {}
 

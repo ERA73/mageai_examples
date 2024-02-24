@@ -1,0 +1,8 @@
+config:
+  database: postgres
+  host: host.docker.internal
+  password: postgres
+  port: 5434
+  schema: public
+  username: admin
+destination: postgresql
