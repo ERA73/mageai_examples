@@ -142,10 +142,10 @@ class TableMapper:
   def generate_create_table_postgres(self, table_name, column_dict):
     columns = []
     for col, data_type in column_dict.items():
-      if data_type["udt_name"] == "varchar":
+      if data_type["udt_name"] == "varchar" and data_type['character_maximum_length']:
         columns.append(f"{col} {data_type['udt_name']}({data_type['character_maximum_length']})")
-      elif data_type["udt_name"] == "numeric":
-        columns.append(f"{col} {data_type['udt_name']}({data_type['numeric_precision']},{data_type['numeric_scale']})")
+      elif data_type["udt_name"] == "numeric" and data_type['numeric_precision']:
+          columns.append(f"{col} {data_type['udt_name']}({data_type['numeric_precision']},{data_type['numeric_scale']})")
       else:
         columns.append(f"{col} {data_type['udt_name']}")
     columns_str = ", ".join(columns)
@@ -165,7 +165,7 @@ class TableMapper:
 
   def generate_insert_queries_postgres(self, table_name, data, data_types):
     queries = []
-    limit = 3
+    limit = 1000
     data_groups = []
     data_len = len(data)
     index = 1
@@ -193,12 +193,14 @@ class TableMapper:
               record.append(str(int(row[column])))
             elif data_types[column] == "numeric":
               record.append(str(row[column]))
-            elif data_types[column] in ["char", "text", "varchar", "timestamp"]:
+            elif data_types[column] in ["char", "bpchar", "text", "varchar", "timestamp", "timestamptz", "date", "time"]:
               record.append(f"'{row[column]}'")
+            elif data_types[column] == "jsonb":
+              record.append(f"""'{str(row[column]).replace("'", '"')}'""")
             elif data_types[column] == "bool":
               record.append(str(row[column]))
             else:
-              record.append(str(row[column]))
+              record.append(f"'{row[column]}'")
           else:
             if data_types[column] == "bool" and row[column] is False:
               record.append(str(row[column]))

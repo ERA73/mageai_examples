@@ -1,0 +1,16 @@
+triggers:
+- envs: []
+  last_enabled_at: 2024-04-20 03:46:46.703632+00:00
+  name: radiant rogue
+  pipeline_uuid: test_table_mapper
+  schedule_interval: '@once'
+  schedule_type: time
+  settings: null
+  sla: null
+  start_time: 2024-04-19 03:12:00+00:00
+  status: active
+  variables:
+    chunk_size: 50000
+    index_column: id
+    table_destination: postgres.public.ejemplo2
+    table_origin: postgres.public.ejemplo

@@ -11,10 +11,12 @@ if 'test' not in globals():
 
 
 @data_loader
-def load_data(*args, **kwargs):
-    db_name = 'postgres'
-    schema = 'public'
-    table_name = 'ejemplo'
+def load_data(data, *args, **kwargs):
+    offset = data["offset"]
+    chunk_size = kwargs["chunk_size"]
+    index_column = kwargs["index_column"]
+    db_name, schema, table_name = kwargs["table_origin"].split(".")
+    output = kwargs["table_destination"]
     mapper = TableMapper()
 
     credentials = ConfigFileLoader(config=
@@ -26,12 +28,10 @@ def load_data(*args, **kwargs):
         'POSTGRES_SCHEMA': schema,}
     )
 
-
     with Postgres.with_config(credentials) as loader:
         full_table_name = f"{db_name}.{schema}.{table_name}"
-        output = f"{db_name}.{schema}.{table_name}_2"
         datatypes_loaded = mapper.get_table_types(loader, schema, table_name)
-        data = loader.load(f"SELECT * FROM {db_name}.{schema}.{table_name}")
+        data = loader.load(f"SELECT * FROM {db_name}.{schema}.{table_name} order by {index_column} OFFSET {offset} LIMIT {chunk_size}")
         print("###################################################################")
         print(datatypes_loaded)
         print("###################################################################")
@@ -40,7 +40,7 @@ def load_data(*args, **kwargs):
         print("###################################################################")
         print(datatypes_loaded)
         print("###################################################################")
-        result = {'table_name':output, 'data':data.to_dict('r'), 'types':datatypes_loaded}
+        result = {'data':data.to_dict('r'), 'types':datatypes_loaded}
         return result
 
 

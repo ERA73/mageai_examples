@@ -1,59 +1,62 @@
 version: '3'
 services:
-  # mageai:
-  #   image: mageai/mageai:0.9.50
-  #   volumes:
-  #     - ./:/home/src
-  #   ports:
-  #     - "6789:6789"
-  #     - "8000:8000"
-  #   cpus: 0.5
-  #   mem_limit: 1g
-  #   command: /app/run_app.sh mage start .
-
-  mageai_front:
-    image: mageai/mageai:0.9.50
+  mageai:
+    image: mageai/mageai:0.9.68
     volumes:
       - ./:/home/src
     env_file:
       - .env
     ports:
       - "6789:6789"
-    command: /app/run_app.sh mage start . --instance-type web_server
-    cpus: 1
-    mem_limit: 1g
-    networks:
-      - my_network
+      - "8000:8000"
+    cpus: 2
+    mem_limit: 4g
     depends_on:
       - mage-db
-      - redis
-  mageai_scheduler1:
-    image: mageai/mageai:0.9.50
-    volumes:
-      - ./:/home/src
-    env_file:
-      - .env
-    command: /app/run_app.sh mage start . --instance-type scheduler
-    deploy:
-      replicas: 2
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1024M
-    networks:
-      - my_network
-    depends_on:
-      - mage-db
-      - redis
+    command: /app/run_app.sh mage start .
+
+  # mageai_front:
+  #   image: mageai/mageai:0.9.68
+  #   volumes:
+  #     - ./:/home/src
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "6789:6789"
+  #   command: /app/run_app.sh mage start . --instance-type web_server
+  #   cpus: 1
+  #   mem_limit: 2g
+  #   networks:
+  #     - my_network
+  #   depends_on:
+  #     - mage-db
+  #     - redis
+  # mageai_scheduler:
+  #   image: mageai/mageai:0.9.68
+  #   volumes:
+  #     - ./:/home/src
+  #   env_file:
+  #     - .env
+  #   command: /app/run_app.sh mage start . --instance-type scheduler
+  #   deploy:
+  #     replicas: 3
+  #     resources:
+  #       limits:
+  #         cpus: '1'
+  #         memory: 1024M
+  #   networks:
+  #     - my_network
+  #   depends_on:
+  #     - mage-db
+  #     - redis
+
   redis:
     image: redis
     ports:
       - "6379:6379"
-    cpus: 0.5
-    mem_limit: 0.5g
+    cpus: 1
     networks:
       - my_network
-
   mage-db:
     image: postgres:latest
     environment:

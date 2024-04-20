@@ -1,6 +1,40 @@
 blocks:
 - all_upstream_blocks_executed: true
   color: null
+  configuration: {}
+  downstream_blocks:
+  - dynamic
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: estimate
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: estimate
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    dynamic: true
+  downstream_blocks:
+  - load_table
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: dynamic
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks:
+  - estimate
+  uuid: dynamic
+- all_upstream_blocks_executed: true
+  color: null
   configuration:
     file_path: null
   downstream_blocks:
@@ -14,7 +48,8 @@ blocks:
   status: executed
   timeout: null
   type: data_loader
-  upstream_blocks: []
+  upstream_blocks:
+  - dynamic
   uuid: load_table
 - all_upstream_blocks_executed: true
   color: null
@@ -51,7 +86,8 @@ blocks:
   uuid: test_export_mapped_tables
 cache_block_output_in_memory: false
 callbacks: []
-concurrency_config: {}
+concurrency_config:
+  block_run_limit: 3
 conditionals: []
 created_at: '2024-01-09 00:53:28.001070+00:00'
 data_integration: null
@@ -71,7 +107,12 @@ settings:
 spark_config: {}
 tags: []
 type: python
-updated_at: '2024-02-10 04:59:11'
+updated_at: '2024-04-20 02:59:42'
 uuid: test_table_mapper
+variables:
+  chunk_size: 50000
+  index_column: id
+  table_destination: postgres.public.ejemplo2
+  table_origin: postgres.public.ejemplo
 variables_dir: /home/src/mage_data/src
 widgets: []
