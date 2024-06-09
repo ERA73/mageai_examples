@@ -2,8 +2,9 @@ if 'transformer' not in globals():
     from mage_ai.data_preparation.decorators import transformer
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
+from utils.decorators import output_memory
 
-
+@output_memory
 @transformer
 def transform(data, *args, **kwargs):
     """

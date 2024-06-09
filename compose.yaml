@@ -1,7 +1,6 @@
-version: '3'
 services:
   mageai:
-    image: mageai/mageai:0.9.68
+    image: mageai/mageai:0.9.50
     volumes:
       - ./:/home/src
     env_file:
@@ -65,7 +64,6 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5430:5432"
-    cpus: 1
   origin:
     image: postgres:latest
     environment:
@@ -74,7 +72,6 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"
-    cpus: 1
     volumes:
       - ./example/init_3.sql:/docker-entrypoint-initdb.d/init.sql
     command: ["postgres", "-c", "log_statement=all"]
@@ -86,12 +83,11 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5434:5432"
-    cpus: 1
 networks:
   my_network:
     driver: bridge
 
 
-# docker-compose down && docker-compose rm && docker-compose up --build
+# docker-compose down && docker-compose rm -f && docker-compose build --no-cache && docker-compose up
 # docker ps
 # docker stats 30c49f87da34

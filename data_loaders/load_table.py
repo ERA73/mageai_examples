@@ -3,13 +3,14 @@ from mage_ai.settings.repo import get_repo_path
 from mage_ai.io.config import ConfigFileLoader
 from mage_ai.io.postgres import Postgres
 from utils.data_type_manager import TableMapper
+from utils.decorators import output_memory
 
 if 'data_loader' not in globals():
     from mage_ai.data_preparation.decorators import data_loader
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
 
-
+@output_memory
 @data_loader
 def load_data(data, *args, **kwargs):
     offset = data["offset"]

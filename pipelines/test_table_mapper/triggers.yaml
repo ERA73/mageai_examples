@@ -8,7 +8,7 @@ triggers:
   settings: null
   sla: null
   start_time: 2024-04-19 03:12:00+00:00
-  status: active
+  status: inactive
   variables:
     chunk_size: 50000
     index_column: id

@@ -1,11 +1,12 @@
 from mage_ai.io.postgres import Postgres
 from mage_ai.io.config import ConfigFileLoader
+from utils.decorators import output_memory
 if 'data_loader' not in globals():
     from mage_ai.data_preparation.decorators import data_loader
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
 
-
+@output_memory
 @data_loader
 def load_data(*args, **kwargs):
     db_name, schema, table_name = kwargs["table_origin"].split(".")

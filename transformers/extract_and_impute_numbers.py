@@ -1,5 +1,6 @@
 from pandas import DataFrame
 import math
+from utils.decorators import output_memory
 
 
 if 'transformer' not in globals():
@@ -17,7 +18,7 @@ def fill_missing_values_with_median(df: DataFrame) -> DataFrame:
         df[[col]] = df[[col]].fillna(median_age)
     return df
 
-
+@output_memory
 @transformer
 def transform_df(df: DataFrame, *args) -> DataFrame:
     return fill_missing_values_with_median(select_number_columns(df))

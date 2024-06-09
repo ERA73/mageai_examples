@@ -2,8 +2,9 @@ if 'data_loader' not in globals():
     from mage_ai.data_preparation.decorators import data_loader
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
+from utils.decorators import output_memory
 
-
+@output_memory
 @data_loader
 def load_data(data, *args, **kwargs):
     rows_count = data["count"]
