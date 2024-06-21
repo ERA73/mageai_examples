@@ -12,7 +12,40 @@ services:
     mem_limit: 4g
     depends_on:
       - mage-db
+    networks:
+      - my_network
     command: /app/run_app.sh mage start .
+
+  mage-db:
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - "5430:5432"
+    networks:
+      - my_network
+  origin:
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./example/init_3.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - my_network
+    command: ["postgres", "-c", "log_statement=all"]
+  destination:
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - "5434:5432"
+    networks:
+      - my_network
+networks:
+  my_network:
+    driver: bridge
 
   # mageai_front:
   #   image: mageai/mageai:0.9.68
@@ -48,44 +81,13 @@ services:
   #   depends_on:
   #     - mage-db
   #     - redis
-
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
-    cpus: 1
-    networks:
-      - my_network
-  mage-db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5430:5432"
-  origin:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5432"
-    volumes:
-      - ./example/init_3.sql:/docker-entrypoint-initdb.d/init.sql
-    command: ["postgres", "-c", "log_statement=all"]
-  destination:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5434:5432"
-networks:
-  my_network:
-    driver: bridge
+  # redis:
+  #   image: redis
+  #   ports:
+  #     - "6379:6379"
+  #   cpus: 1
+  #   networks:
+  #     - my_network
 
 
 # docker-compose down && docker-compose rm -f && docker-compose build --no-cache && docker-compose up

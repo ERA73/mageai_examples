@@ -1,0 +1,73 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_path: null
+  downstream_blocks:
+  - test_sql
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: estimate
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: estimate
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_database: postgres
+    data_provider_profile: default
+    data_provider_schema: public
+    data_provider_table: ''
+    dbt: {}
+    export_write_policy: replace
+    limit: 1000
+    use_raw_sql: false
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: test_sql
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - estimate
+  uuid: test_sql
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals: []
+created_at: '2024-06-21 01:34:45.322727+00:00'
+data_integration: null
+description: null
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: test_all
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags: []
+type: python
+updated_at: '2024-06-21 02:21:56'
+uuid: test_all
+variables:
+  chunk_size: 50000
+  index_column: id
+  table_destination: postgres.public.ejemplo2
+  table_origin: postgres.public.ejemplo
+variables_dir: /home/src/mage_data/src
+widgets: []
