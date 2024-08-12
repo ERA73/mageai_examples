@@ -1,0 +1,82 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - plot_data_transformer
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: plot_data_loader
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: plot_data_loader
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - bar_chart_for_plot_data_transformer_1723423475819
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: plot_data_transformer
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - plot_data_loader
+  uuid: plot_data_transformer
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals: []
+created_at: '2024-08-11 23:39:41.783800+00:00'
+data_integration: null
+description: null
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: test_plots
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags: []
+type: python
+updated_at: '2024-08-12T01:34:41+00:00'
+uuid: test_plots
+variables_dir: /home/src/mage_data/src
+widgets:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    chart_style: horizontal
+    chart_type: bar chart
+    group_by: []
+    metrics: []
+    x: x
+    y: y
+    y_sort_order: ascending
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: bar chart for plot_data_transformer 1723423475819
+  retry_config: null
+  status: executed
+  timeout: null
+  type: chart
+  upstream_blocks:
+  - plot_data_transformer
+  uuid: bar_chart_for_plot_data_transformer_1723423475819
