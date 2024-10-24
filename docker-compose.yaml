@@ -1,0 +1,105 @@
+services:
+  mageai:
+    image: mageai/mageai:0.9.74
+    volumes:
+      - ./:/home/src
+      - ./mage_fix/data.py:/usr/local/lib/python3.10/site-packages/mage_ai/data_preparation/models/block/dynamic/data.py
+      - ./mage_fix/variables.py:/usr/local/lib/python3.10/site-packages/mage_ai/data_preparation/models/block/dynamic/variables.py
+      - ./mage_fix/__init__.py:/usr/local/lib/python3.10/site-packages/mage_ai/data_preparation/models/block/__init__.py
+    env_file:
+      - .env
+    ports:
+      - "6789:6789"
+      - "8000:8000"
+    cpus: 4
+    mem_limit: 8g
+    depends_on:
+      - mage-db
+    networks:
+      - my_network
+    command: /app/run_app.sh mage start .
+
+  mage-db:
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - "5430:5432"
+    networks:
+      - my_network
+  origin:
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./example/init_3.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - my_network
+    command: ["postgres", "-c", "log_statement=all"]
+  destination:
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - "5434:5432"
+    networks:
+      - my_network
+  redis:
+     image: redis
+     ports:
+       - "6379:6379"
+     cpus: 1
+     networks:
+       - my_network
+networks:
+  my_network:
+    driver: bridge
+
+  # mageai_front:
+  #   image: mageai/mageai:0.9.68
+  #   volumes:
+  #     - ./:/home/src
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "6789:6789"
+  #   command: /app/run_app.sh mage start . --instance-type web_server
+  #   cpus: 1
+  #   mem_limit: 2g
+  #   networks:
+  #     - my_network
+  #   depends_on:
+  #     - mage-db
+  #     - redis
+  # mageai_scheduler:
+  #   image: mageai/mageai:0.9.68
+  #   volumes:
+  #     - ./:/home/src
+  #   env_file:
+  #     - .env
+  #   command: /app/run_app.sh mage start . --instance-type scheduler
+  #   deploy:
+  #     replicas: 3
+  #     resources:
+  #       limits:
+  #         cpus: '1'
+  #         memory: 1024M
+  #   networks:
+  #     - my_network
+  #   depends_on:
+  #     - mage-db
+  #     - redis
+  # redis:
+  #   image: redis
+  #   ports:
+  #     - "6379:6379"
+  #   cpus: 1
+  #   networks:
+  #     - my_network
+
+
+# docker-compose down && docker-compose rm -f && docker-compose build --no-cache && docker-compose up
+# docker ps
+# docker stats 30c49f87da34
