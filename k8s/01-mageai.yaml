@@ -46,7 +46,7 @@ spec:
     - containerPort: 6789
     volumeMounts:
     - name: mage-fs
-      mountPath: /home/src/mage_volume
+      mountPath: /home/src/mage_data/src
     env:
       - name: KUBE_NAMESPACE
         valueFrom:
@@ -64,5 +64,5 @@ spec:
   volumes:
   - name: mage-fs
     hostPath:
-      path: /path/to/mage_project
+      path: /home/src
   serviceAccountName: mage-user
