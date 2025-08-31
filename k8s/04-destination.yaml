@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: destination
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: destination
+  template:
+    metadata:
+      labels:
+        app: destination
+    spec:
+      containers:
+      - name: destination
+        image: postgres:latest
+        ports:
+          - containerPort: 5432
+        envFrom:
+          - configMapRef:
+              name: mage-config
+          - secretRef:
+              name: mage-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: destination
+spec:
+  selector:
+    app: destination
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP

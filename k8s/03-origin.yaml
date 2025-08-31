@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: origin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: origin
+  template:
+    metadata:
+      labels:
+        app: origin
+    spec:
+      containers:
+      - name: origin
+        image: postgres:15
+        # ❌ NO usar command, la imagen oficial ya arranca postgres con usuario correcto
+        ports:
+          - containerPort: 5432
+        envFrom:
+          - configMapRef:
+              name: mage-config
+          - secretRef:
+              name: mage-secrets
+        volumeMounts:
+        - name: init-sql
+          mountPath: /docker-entrypoint-initdb.d
+          readOnly: true
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: init-sql
+        configMap:
+          name: origin-init
+          items:
+          - key: init.sql
+            path: init.sql
+      - name: postgres-data
+        emptyDir: {}   # ⚠️ Solo para pruebas, usa PVC en producción
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: origin-init
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS ejemplo (
+      id SERIAL PRIMARY KEY,
+      data TEXT
+    );
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: origin
+spec:
+  selector:
+    app: origin
+  ports:
+  - name: postgres
+    port: 5433        # Puerto interno del Service en el cluster
+    targetPort: 5432  # Puerto real dentro del contenedor
+  type: ClusterIP

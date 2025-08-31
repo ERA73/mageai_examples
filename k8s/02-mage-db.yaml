@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mage-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mage-db
+  template:
+    metadata:
+      labels:
+        app: mage-db
+    spec:
+      containers:
+      - name: mage-db
+        image: postgres:latest
+        ports:
+          - containerPort: 5432
+        envFrom:
+          - configMapRef:
+              name: mageai-env
+          # - configMapRef:
+          #     name: mage-config
+          # - secretRef:
+          #     name: mage-secrets
+        volumeMounts:
+        - name: mage-db-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: mage-db-data
+        persistentVolumeClaim:
+          claimName: mage-db-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mage-db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mage-db
+spec:
+  selector:
+    app: mage-db
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP
