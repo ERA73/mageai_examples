@@ -42,8 +42,7 @@ spec:
   - name: mage-server
     image: mageai:v1.0.0
     imagePullPolicy: Never
-    ports:
-    - containerPort: 6789
+    command: ["/app/run_app.sh", "mage", "start", ".", "--instance-type", "scheduler"]
     volumeMounts:
     - name: mage-fs
       mountPath: /home/src/mage_data/src
